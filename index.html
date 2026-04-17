@@ -121,7 +121,7 @@ async function getRandomMessage(){
 const SC=document.getElementById('scene'),scx=SC.getContext('2d',{willReadFrequently:true});
 const FX=document.getElementById('fx'),fxc=FX.getContext('2d');
 let W,H,t=0,motionOn=true,soundOn=true,imgReady=false;
-const RENDER_SCALE=0.5;let rW,rH;
+const RENDER_SCALE=0.7;let rW,rH;
 const offscreen=document.createElement('canvas'),oCtx=offscreen.getContext('2d',{willReadFrequently:true});
 function resize(){W=innerWidth;H=innerHeight;SC.width=W;SC.height=H;FX.width=W;FX.height=H;rW=Math.floor(W*RENDER_SCALE);rH=Math.floor(H*RENDER_SCALE);offscreen.width=rW;offscreen.height=rH}
 resize();addEventListener('resize',resize);
@@ -142,8 +142,7 @@ function initAudio(){
   audio.play();
 }
 function tryStartAudio(){if(audioStarted)return;audioStarted=true;initAudio()}
-document.addEventListener('click',tryStartAudio,{once:false});
-document.addEventListener('touchstart',tryStartAudio,{once:false});
+['click','touchstart','keydown','pointerdown'].forEach(e=>document.addEventListener(e,tryStartAudio,{once:false}));
 
 function toggleSound(){
   soundOn=!soundOn;
