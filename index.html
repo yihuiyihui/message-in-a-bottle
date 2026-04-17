@@ -75,8 +75,8 @@
   <button class="ctrl-btn" id="motionBtn" onclick="toggleMotion()" title="Motion"><svg id="motionIcon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
 </div>
 <div class="credits">
-  <span class="credits-line">Art by <a href="#" target="_blank" rel="noopener">[artist name]</a></span>
-  <span class="credits-line">Sound from <a href="#" target="_blank" rel="noopener">[sound source]</a></span>
+  <span class="credits-line">Art by <a href="google.com/search?q=Turner+sea+view&sca_esv=27fdc1d65c2ac978&sxsrf=ANbL-n5nWLlNbQAKrAKCAbI7bQmfvL-JSQ%3A1776432829732&ei=vTbiabmsLPGP4-EPxIGF8QE&biw=1440&bih=754&ved=0ahUKEwj5_qH-__STAxXxxzgGHcRAIR4Q4dUDCBE&uact=5&oq=Turner+sea+view&gs_lp=Egxnd3Mtd2l6LXNlcnAiD1R1cm5lciBzZWEgdmlldzIGEAAYFhgeMgYQABgWGB4yCxAAGIAEGIoFGIYDMgsQABiABBiKBRiGAzILEAAYgAQYigUYhgMyCBAAGIAEGKIEMgUQABjvBTIIEAAYgAQYogQyBRAAGO8FSNkLUPoBWPwKcAF4AZABAJgBkgGgAZAHqgEDNy4yuAEDyAEA-AEBmAIKoALWB8ICChAAGEcY1gQYsAPCAgQQIxgnwgIKEC4YgAQYigUYQ8ICBRAAGIAEwgIZEC4YgAQYigUYQxiXBRjcBBjeBBjfBNgBAcICChAAGIAEGIoFGEPCAgsQLhiABBjHARivAZgDAIgGAZAGCLoGBggBEAEYFJIHAzMuN6AHsVqyBwMyLje4B88HwgcFMi05LjHIBzqACAE&sclient=gws-wiz-serp" target="_blank" rel="noopener">Sea View - Joseph Mallord William Turner</a></span>
+  <span class="credits-line">Sound from <a href="https://pixabay.com/sound-effects/nature-sea-waves-7131/" target="_blank" rel="noopener">Pixabay</a></span>
 </div>
 <div class="ui">
   <div class="scr on" id="landing"><h1 class="title">Message in a Bottle</h1><p class="sub">the sea remembers</p><div class="btns"><button class="btn p" onclick="go('write')">Write a message</button><a class="link-text" onclick="findBottle()">Find a bottle</a></div></div>
@@ -106,7 +106,18 @@
 </div>
 <div class="throw-overlay" id="throwOv"><svg class="throw-anim" width="44" height="84" viewBox="0 0 44 84"><rect x="16" y="2" width="12" height="13" rx="2.5" fill="#e0d4bc" stroke="rgba(180,165,135,.4)" stroke-width=".8"/><path d="M15,15 Q13,22 12,30 Q10,42 10,52 Q10,66 14,74 Q17,80 22,80 Q27,80 30,74 Q34,66 34,52 Q34,42 32,30 Q31,22 29,15 Z" fill="rgba(200,225,218,.18)" stroke="rgba(200,225,218,.3)" stroke-width=".8"/></svg></div>
 <script>
-const bottles=["I miss who I was before I started performing for the internet.","Sometimes I close all my tabs and just sit here. It feels like coming home.","I hope you're taking care of yourself. I mean it.","The best conversations I've ever had were with strangers I'll never meet again.","I deleted social media for a month and nobody noticed. That taught me something.","Somewhere right now, someone is thinking about you and smiling.","I want to make something beautiful but I'm afraid nobody will see it.","The internet used to feel like a place. Now it feels like a machine.","Dear stranger \u2014 you are more than your feed.","I spent today watching clouds. No photos. It was the most real thing I've done in weeks.","I wrote this instead of sending a text I'd regret. Thank you for reading it.","Some nights the quiet is so loud I come online just to feel less alone."];
+const bottles=[];
+const API_URL='https://script.google.com/macros/s/AKfycbygULrjOj1PpZIyZo5uJt7SqKEbWA2_YqK0l2iYNYuewEOz1FK6XzQsLQLyMzPLSPh1tg/exec';
+
+async function writeMessage(text){
+  try{await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'write',message:text})})}
+  catch(e){console.error('Write failed:',e)}
+}
+
+async function getRandomMessage(){
+  try{const r=await fetch(API_URL+'?action=random');const d=await r.json();return d.message}
+  catch(e){console.error('Read failed:',e);return null}
+}
 const SC=document.getElementById('scene'),scx=SC.getContext('2d',{willReadFrequently:true});
 const FX=document.getElementById('fx'),fxc=FX.getContext('2d');
 let W,H,t=0,motionOn=true,soundOn=true,imgReady=false;
@@ -176,9 +187,9 @@ function go(id){
       if(id==='write')setTimeout(()=>document.getElementById('msgIn').focus(),500)},700);
   }else{document.querySelectorAll('.scr').forEach(s=>{s.classList.remove('on');s.style.opacity=''});void next.offsetWidth;next.classList.add('on');if(id==='write')setTimeout(()=>document.getElementById('msgIn').focus(),500)}}
 function charCt(){const i=document.getElementById('msgIn'),c=document.getElementById('cc');c.textContent=i.value.length+' / 500';c.classList.toggle('v',i.value.length>0)}
-function throwBottle(){const m=document.getElementById('msgIn').value.trim();if(!m)return;bottles.push(m);document.getElementById('msgIn').value='';charCt();const cur=document.querySelector('.scr.on');if(cur){cur.style.opacity='0';cur.classList.add('fading');setTimeout(()=>{cur.classList.remove('on','fading');cur.style.opacity=''},700)}const o=document.getElementById('throwOv');setTimeout(()=>o.classList.add('on'),600);setTimeout(()=>{o.classList.remove('on');const s=o.querySelector('svg'),c=s.cloneNode(true);s.replaceWith(c);document.getElementById('thrownTxt').textContent='Your bottle drifts into the dark\u2026';go('thrown')},3500)}
-function findBottle(){if(!bottles.length){go('empty');return}pickBottle()}
-function pickBottle(){if(!bottles.length){go('empty');return}document.getElementById('paperMsg').textContent=bottles[Math.floor(Math.random()*bottles.length)];go('read')}
+async function throwBottle(){const m=document.getElementById('msgIn').value.trim();if(!m)return;writeMessage(m);document.getElementById('msgIn').value='';charCt();const cur=document.querySelector('.scr.on');if(cur){cur.style.opacity='0';cur.classList.add('fading');setTimeout(()=>{cur.classList.remove('on','fading');cur.style.opacity=''},700)}const o=document.getElementById('throwOv');setTimeout(()=>o.classList.add('on'),600);setTimeout(()=>{o.classList.remove('on');const s=o.querySelector('svg'),c=s.cloneNode(true);s.replaceWith(c);document.getElementById('thrownTxt').textContent='Your bottle drifts into the dark\u2026';go('thrown')},3500)}
+function findBottle(){pickBottle()}
+async function pickBottle(){const msg=await getRandomMessage();if(!msg){go('empty');return}document.getElementById('paperMsg').textContent=msg;go('read')}
 function throwBack(){const cur=document.querySelector('.scr.on');if(cur){cur.style.opacity='0';cur.classList.add('fading');setTimeout(()=>{cur.classList.remove('on','fading');cur.style.opacity=''},700)}const o=document.getElementById('throwOv');setTimeout(()=>o.classList.add('on'),600);setTimeout(()=>{o.classList.remove('on');const s=o.querySelector('svg'),c=s.cloneNode(true);s.replaceWith(c);go('landing')},3500)}
 </script>
 </body>
